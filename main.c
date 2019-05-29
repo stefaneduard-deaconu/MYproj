@@ -27,6 +27,24 @@ void cpy(char *a, char *b)
     while(b[i++] != 0);
 }
 
+
+/*
+ * definition struct and how to instantiate one:
+*/
+struct definition
+{
+    char *def;
+    definition *nxt;
+};
+definition* defi(char *d)
+{
+    definition *q = new definition;
+    char *d2 = new char[leng(d)];
+    cpy(d2, d);
+    q->def = d2;
+    return q;
+}
+
 int main()
 {
     
