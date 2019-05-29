@@ -10,7 +10,20 @@ void ShowConsoleCursor(bool showFlag);
 void gotoxy( short x, short y );
 
 char* trim(char *a);
-
+int leng(char *a)
+{
+    int lg = 0;
+    while(a[lg])
+        lg++;
+    return lg;
+}
+void cpy(char *a, char *b)
+{
+    int i = 0;
+    do
+        a[i] = b[i];
+    while(b[i++] != 0);
+}
 
 int main()
 {
