@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const char ENTER = 13, UP = 72, DOWN = 80, LEFT = 75, RIGHT = 77;
+
 void ShowConsoleCursor(bool showFlag);
 void gotoxy( short x, short y );
 
