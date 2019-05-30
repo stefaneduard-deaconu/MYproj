@@ -1,26 +1,19 @@
 #include <iostream>
 #include <fstream>
-
+#include <cstdio>
 #include <windows.h>
 #include <conio.h>
 
 using namespace std;
 
-const char ENTER = 13, UP = 72, DOWN = 80, LEFT = 75, RIGHT = 77;
+const char ENTER = 13, ESCAPE = 27, BACKSPACE = 8, KEYS = -32, UP = 72, DOWN = 80, LEFT = 75, RIGHT = 77;
 
-void ShowConsoleCursor(bool showFlag);
-void gotoxy( short x, short y );
-
-/*
- * functions for working with char* variables:
-*/
-char* trim(char *a);
 int leng(char *a)
 {
-    int lg = 0;
-    while(a[lg])
-        lg++;
-    return lg;
+    int i = 0;
+    while(a[i])
+        i++;
+    return i;
 }
 void cpy(char *a, char *b)
 {
@@ -29,335 +22,617 @@ void cpy(char *a, char *b)
         a[i] = b[i];
     while(b[i++] != 0);
 }
-
-/*
- * definition struct and how to instantiate one:
-*/
-struct definition
+bool ncmp(char *a, char *b, int n)
 {
-    char *def;
-    definition *nxt;
-};
-definition* defi(char *d)
-{
-    definition *q = new definition;
-    char *d2 = new char[leng(d)];
-    cpy(d2, d);
-    q->def = d2;
-    return q;
+    int i = 0;
+    while(i < n && a[i] == b[i])
+        i++;
+    if(i == n)
+        return true;
+    return false;
 }
-
-/* 
- * as to make a dictionary, we define a trie (reTRIEval tree)
- */
-class trie
+int cmp(char *a, char *b)
 {
-private:
-    trie *t[26]; // limitare memorie? (1)
-    int nrdefs;
-    definition *d;
-    bool isword;
-public:
-    void allc(int p) // allocate
-    {
-        trie *tr;
-        tr = new trie;
-        this->t[p] = tr;
-    }
-    void init()
-    {
-        //t = new trie*[26]; (1)
-        for(int i = 0; i < 26; i++)
-            t[i] = NULL;
-        d = NULL;
-        nrdefs = isword = 0;
-    }
-    trie* addr(int p)
-    {
-        return t[p];
-    }
-    void word()
-    {
-        isword = 1;
-    }
-    void defs(definition *def)
-    {
-        this->d = def;
-    }
-    void addw(char *s)
-    {
-        system("cls"); /// It remains to be seen
-        int lg = 0, w[51]; /// schimbat lungimea
-        while(s[lg] != 0)
-            w[lg] = s[lg] - 'a', lg++;
-        int pz = 0;
-        trie *ptr = this;
-        while(pz < lg)
-        {
-            if(ptr->t[w[pz]] != NULL)
-                ptr = ptr->t[w[pz]], pz++;
-            else
-                while(pz < lg)
-                {
-                    ptr->allc(w[pz]);
-                    ptr = ptr->t[w[pz]];
-                    ptr->init();
-                    pz++;
-                }
-        }
-        ptr->word();
-        ShowConsoleCursor(false); ///
-        cout << "Adaugati definitii?\n";  // row 0
-        cout << "   DA\n";              // row 1
-        cout << "   NU\n";              // row 2
-        int row = 1;
-        char ch;
-        gotoxy(row, 6);
-        cout << '*';
-        do
-        {
-
-            ch = getch();
-            if(ch == -32)
-            {
-                ch = getch();
-                if(ch == UP && row == 2)
-                {
-                    /// subprogram
-                    gotoxy(row, 6);
-                    cout << ' ';
-                    gotoxy(--row, 6);
-                    cout << '*';
-                }
-                if (ch == DOWN && row == 1)
-                {
-                    /// subprogram
-                    gotoxy(row, 6);
-                    cout << ' ';
-                    gotoxy(++row, 6);
-                    cout << '*';
-                }
-            }
-        } /// FOR NOW
-        while(ch != ENTER);
-        ShowConsoleCursor(true); ///
-        if (row == 1) // DA
-        {
-            gotoxy(1, 3);
-            cout << '\t' ;
-            gotoxy(2, 3);
-            cout << '\t' ;
-            gotoxy(0, 0);
-            cout << s << ": \t\t\t\t\n";
-            ptr->addd();
-        }
-        else
-            cin.get(); /// where this "carriage return" from
-        system("cls"); /// It remains to be seen
-    }
-    void addd()
-    {
-        cin.get(); /// where this "carriage return" from
-        int nrd = 0;
-        definition *definitions, *ptr = definitions; /// FIRSTLY, ptr = definitions is useless.
-        definitions = new definition;
-        ptr = definitions;
-        char df[101]; // d is already taken for the CLASS
-        do
-        {
-            cout << '\t';
-            cin.getline(df, 101); /// length
-            if(df[0])
-            {
-                nrd++;
-                ptr->nxt = defi(df);
-                ptr = ptr->nxt;
-                continue;
-            }
-            else break;
-        }
-        while(df[0] != 0); /// mai ramane de verificat cu alte taste.
-        if(ptr != NULL) /// WHY
-            ptr->nxt = NULL; /// THE
-        if(nrd > 0) ///definitions != NULL) /// HELL
-            {
-                this->defs(definitions->nxt); /// ????
-                this->nrdefs += nrd;
-            }
-        else
-            delete definitions;
-    }
-    void list()
-    {
-        trie *a[50];
-        int w[51];
-        w[0] = -1;
-        int p = 0;
-        a[p] = this;
-        while(p >= 0)
-        {
-            int ok = 1;
-            for(int i = w[p] + 1; i < 26; i++)
-                if(a[p]->t[i] != NULL)
-                {
-                    w[p] = i;
-                    p++;
-                    w[p] = -1;
-                    a[p] = a[p - 1]->t[i];
-                    ok = 0;
-                    break;
-                }
-            if(ok != 0) // in ordinea inversa (fata de afisare), se afiseaza de doua ori, logically
-                p--;
-            else    /// merge modificat??
-                if(a[p]->isword == 1)
-                {
-                    for(int i = 0; i < p; i++)
-                        cout << char(w[i] + 'a');
-                    cout << endl;
-                    definition *ptr = a[p]->d; /// I am the most stupid guy, I wrote this->d instead of a[p]->d
-                    while(ptr != NULL)
-                    {
-                        cout << "  = " << ptr->def << endl;
-                        ptr = ptr->nxt;
-                    }
-                }
-        }
-    }
-    void rite(char *doc1, char *doc2) /// read() si rite utilizeaza doua variante dintre care trebuie sa aleg doar una!!!
-    {
-        ofstream f1(doc1);
-        ofstream f2(doc2);
-        trie *a[50];
-        int w[51];
-        w[0] = -1;
-        int p = 0;
-        a[p] = this;
-        while(p >= 0)
-        {
-            int ok = -1; ///  modif
-            for(int i = w[p] + 1; i < 26; i++)
-                if(a[p]->t[i] != NULL)
-                {
-                    w[p] = i;
-                    p++;
-                    w[p] = -1;
-                    a[p] = a[p - 1]->t[i];
-                    ok = i;
-                    break;
-                }
-            if(ok == -1)
-            {
-                p--;
-                f1 << ok << '\n';/// modif
-            }
-            else
-            {
-                f1 << ok << ' ' << a[p]->isword << '\n'; /// modif
-                if(a[p]->isword)
-                {
-                    f2 << a[p]->nrdefs << '\n';
-                    definition *ptr = a[p]->d;
-                    while(ptr != NULL)
-                    {
-                        f2 << ptr->def << '\n';
-                        ptr = ptr->nxt;
-                    }
-                }
-            }
-        }
-        f1.close();
-        f2.close();
-    }
-    void nrdf(int nrd)
-    {
-        this->nrdefs = nrd;
-    }
-    void read(char *doc1, char *doc2)
-    {
-        ifstream f1(doc1);
-        ifstream f2(doc2);
-        trie *a[50];
-        unsigned char w[51]; /// NOT USED . . .
-        int p = 0, next, word;
-        this->init();
-        a[p] = this;
-        while(p >= 0)
-        {
-            f1 >> next;
-            if(next >= 0)
-            {
-                f1 >> word;
-                w[p] = 'a' + next; ///
-                a[p]->allc(next);
-                p++;
-                a[p] = a[p - 1]->addr(next);
-                a[p]->init();
-                if(word != 0) a[p]->word();
-                w[p] = 0; ///
-                if (word)
-                {
-                    //cout << w << '\n'; ///
-                    /// allocating a new "definition"; need to think about the names of the variables
-                    definition *definitions, *ptr = definitions; /// FIRSTLY, ptr = definitions is useless.
-                    int nrdfs;
-                    f2 >> nrdfs;
-                    if(nrdfs > 0)
-                    {
-                        f2.get();
-                        a[p]->nrdf(nrdfs);
-
-                        definitions = new definition;
-                        ptr = definitions;
-                        do
-                        {
-                            char d[101]; /// the length needs to be modified, or not
-                            f2.getline(d, 101);
-                            ptr->nxt = defi(d);
-                            ptr = ptr->nxt;
-                        }
-                        while(--nrdfs);
-                    }
-                    if(ptr != NULL) /// WHY
-                        ptr->nxt = NULL; /// THE
-                    if(definitions != NULL) /// HELL
-                        a[p]->defs(definitions->nxt); /// ?
-                }
-            }
-            else
-                p--;
-        }
-        f1.close();
-        f2.close();
-    }
-};
-
-int main()
-{
-    
-    return 0;
+    int i = 0;
+    while(a[i] == b[i] && a[i])
+        i++;
+    if(a[i] == b[i])
+        return 0;
+    if(a[i] > b[i])
+        return 1;
+    return -1;
 }
-
-char* trim(char *a)
+void gotoxy(short x, short y)
 {
-    char *b = new char[leng(a)];
-    cpy(b, a); // b <- a
-    return b;
+    COORD p = {y, x};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), p);
 }
-
-void gotoxy( short x, short y )
-{
-    COORD p = { y, x };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
-}
-
 void ShowConsoleCursor(bool showFlag)
 {
     HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    CONSOLE_CURSOR_INFO     cursorInfo;
-
+    CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(out, &cursorInfo);
-    cursorInfo.bVisible = showFlag; // set the cursor visibility
+    cursorInfo.bVisible = showFlag;
     SetConsoleCursorInfo(out, &cursorInfo);
+}
+char *path()
+{
+    char *p = new char[MAX_PATH];
+    GetModuleFileName(NULL, p, MAX_PATH);
+    int i = leng(p);
+    do
+        i--;
+    while(p[i] != '\\' );
+    p[i] = 0;
+    return p;
+}
+void Continue(const char *message)
+{
+    system("cls");
+    cout << message << endl;
+    cout << "Press ENTER to continue...";
+    cin.get();
+    system("cls");
+}
+///
+
+
+bool exists(char *name, char *Path) /// trebuie verificate toate cazurile posibile
+{
+    char _words[] = "\\_words.txt", _aux[] = "\\_aux.txt";
+    char p1[MAX_PATH], p2[MAX_PATH];
+    cpy(p1, Path);
+    cpy(p1 + leng(p1), _words);
+    cpy(p2, Path);
+    cpy(p2 + leng(p2), _aux);
+    fstream f1, f2;
+    f1.open(p1, ios_base::in);
+    f2.open(p2, ios_base::out);
+    char word[51];
+    while(f1.getline(word, 51) && cmp(word, name) == -1)
+        f2 << word << '\n';
+    if(word[0] && cmp(word, name) == 0)
+    {
+        Continue("The word is already in the dictionary!");
+        return true;
+    }
+    f2 << name << '\n';
+    if (word[0])
+        f2 << word << '\n';
+    while(f1.getline(word, 51))
+        f2 << word << '\n';
+    f1.close();
+    f2.close();
+    f1.open(p2, ios_base::in);
+    f2.open(p1, ios_base::out);
+    while(f1.getline(word, 51))
+        f2 << word << '\n';
+    f1.close();
+    f2.close();
+    return false;
+}
+void Addwords(char *Path)
+{
+    system("cls");
+    ShowConsoleCursor(true);
+    fstream f;
+    char word[52], wordPath[MAX_PATH], *ptr1, *ptr2, dottxt[] = ".txt";
+    word[0] = '\\';
+    ptr1 = word + 1;
+    cpy(wordPath, Path);
+    int lengPath = leng(wordPath);
+    ptr2 = wordPath + lengPath;
+    int nrwords = 0;
+    do
+    {
+        cout << "word:    <ENTER TO STOP>" << '\n';
+        cin.getline(ptr1, 51);
+        int lgw = leng(ptr1);
+        if(lgw && exists(ptr1, Path) == false)
+        {
+            nrwords++;
+            cpy(ptr1 + lgw, dottxt);
+            cpy(ptr2, word);
+            f.open(wordPath, ios_base::out);
+            char def[251];
+            cout << "    definitions:    <ENTER TO STOP>" << '\n';
+            do
+            {
+                cout << "    ";
+                cin.getline(def, 251);
+                if(def[0])
+                    f << def << '\n';
+                else
+                    break;
+            }
+            while(def[0]);
+            f.close();
+        }
+    }
+    while(ptr1[0]);
+    char docsPath[MAX_PATH], auxPath[MAX_PATH], _docs[] = "\\_docs.txt", _aux[] = "\\_aux.txt";
+    cpy(docsPath, Path);
+    cpy(auxPath, Path);
+    int pos = lengPath;
+    while(docsPath[pos] != '\\')
+        pos--;
+    char dictname[51];
+    cpy(dictname, docsPath + pos + 1);
+    cpy(docsPath + pos, _docs);
+    cpy(auxPath + pos, _aux);
+    fstream f1, f2;
+    int number;
+    char line[51];
+    f1.open(docsPath, ios_base::in);
+    f2.open(auxPath, ios_base::out);
+    f1 >> number;
+    f2 << number << '\n';
+    f1.get();
+    while(f1.getline(line, 51))
+    {
+        f1 >> number;
+        f1.get();
+        if(cmp(line, dictname) == 0)
+            number += nrwords;
+        f2 << line << '\n' << number << '\n';
+    }
+    f1.close();
+    f2.close();
+    f1.open(auxPath, ios_base::in);
+    f2.open(docsPath, ios_base::out);
+    while(f1.getline(line, 51))
+        f2 << line << '\n';
+    f1.close();
+    f2.close();
+    ShowConsoleCursor(false);
+    system("cls");
+}
+
+bool isDir(char *name)
+{
+    char p1[MAX_PATH], p2[MAX_PATH], _docs[] = "\\_docs.txt", _aux[] = "\\_aux.txt";
+    int lengPath;
+    cpy(p1, path());
+    cpy(p2, p1);
+    lengPath = leng(p1);
+    cpy(p1 + lengPath, _docs);
+    cpy(p2 + lengPath, _aux);
+    fstream f1, f2;
+    f1.open(p1, ios_base::in);
+    f2.open(p2, ios_base::out);
+    int number;
+    char line[51];
+    f1 >> number;
+    f1.get();
+    f2 << number << '\n';
+    while(f1.getline(line, 51) && cmp(line, name) == -1)
+    {
+        f2 << line << '\n';
+        f1 >> number;
+        f1.get();
+        f2 << number << '\n';
+    }
+    if(line[0] && cmp(line, name) == 0)
+    {
+        Continue("There already is a 'dictionnary' with the same name!");
+        return true;
+    }
+    f2 << name << '\n' << '0' << '\n';
+    if(line[0])
+    {
+        f1 >> number;
+        f1.get();
+        f2 << line << '\n' << number << '\n';
+    }
+    while(f1.getline(line, 51))
+    {
+
+        f1 >> number;
+        f1.get();
+        f2 << line << '\n' << number << '\n';
+    }
+    f1.close();
+    f2.close();
+    f1.open(p2, ios_base::in);
+    f2.open(p1, ios_base::out);
+    f1 >> number;
+    f1.get();
+    f2 << (number + 1) << '\n';
+    while(f1.getline(line, 51))
+    {
+        f1 >> number;
+        f1.get();
+        f2 << line << '\n' << number << '\n';
+    }
+    f1.close();
+    f2.close();
+    return false;
+}
+
+void newDictionary()
+{
+    system("cls");
+    ShowConsoleCursor(true);
+    cout << "Name of the 'dictionary':    <ENTER TO EXIT>" << '\n';
+    char name[51];
+    cin.getline(name, 51);
+    if(name[0])
+    {
+        ///creez folderul
+        char p[MAX_PATH];
+        cpy(p, path());
+        if(isDir(name) == false)
+        {
+            char bslash[] = "\\";
+            cpy(p + leng(p), bslash);
+            cpy(p + leng(p), name);
+            CreateDirectory(p, NULL);
+            Addwords(p);
+        }
+    }
+    ShowConsoleCursor(false);
+    system("cls");
+}
+
+void delDictionary(char *Path)
+{
+    system("cls");
+    fstream f1, f2;
+    char docsPath[MAX_PATH], auxPath[MAX_PATH], _docs[] = "\\_docs.txt", _aux[] = "\\_aux.txt";
+
+    cpy(docsPath, Path);
+    cpy(auxPath, Path);
+    int pos = leng(docsPath);
+    while(docsPath[pos] != '\\')
+        pos--;
+    char dictname[MAX_PATH];
+    cpy(dictname, docsPath + pos + 1);
+    cpy(docsPath + pos, _docs);
+    cpy(auxPath + pos, _aux);
+    int number;
+    char line[51];
+    f1.open(docsPath, ios_base::in);
+    f2.open(auxPath, ios_base::out);
+    f1 >> number;
+    f1.get();
+    f2 << (number - 1) << '\n';
+    while(f1.getline(line, 51))
+    {
+        if(cmp(line, dictname) == 0)
+            f1.getline(line, 51);
+        else
+            f2 << line << '\n';
+    }
+    f1.close();
+    f2.close();
+    f1.open(auxPath, ios_base::in);
+    f2.open(docsPath, ios_base::out);
+    while(f1.getline(line, 51))
+        f2 << line << '\n';
+    f1.close();
+    f2.close();
+    char wordsPath[MAX_PATH], wordPath[MAX_PATH], _words[] = "\\_words.txt", dottxt[] = ".txt", bslash[] = "\\";
+    int lengPath = leng(Path);
+    cpy(wordsPath, Path);
+    cpy(wordsPath + lengPath, _words);
+    cpy(wordPath, Path);
+    cpy(wordPath + lengPath, bslash);
+    f1.open(wordsPath, ios_base::in);
+    while(f1.getline(line, 51))
+    {
+        cpy(wordPath + lengPath + 1, line);
+        cpy(wordPath + leng(wordPath), dottxt);
+        DeleteFileA(wordPath);
+    }
+    f1.close();
+    char p[MAX_PATH];
+    cpy(p, Path);
+    int lgp = leng(p);
+    cpy(p + lgp, _words);
+    DeleteFileA(p);
+    cpy(p + lgp, _aux);
+    DeleteFileA(p);
+    RemoveDirectoryA(Path);
+    system("cls");
+}
+
+void Showdefs(char *word, char *Path)
+{
+    system("cls");
+    char wordPath[MAX_PATH], dottxt[] = ".txt";
+    int lgpath = leng(Path);
+    cpy(wordPath, Path);
+    wordPath[lgpath] = '\\';
+    cpy(wordPath + lgpath + 1, word);
+    cpy(wordPath + leng(wordPath), dottxt);
+    ifstream f(wordPath);
+    char def[251];
+    cout << word << endl;
+    while(f.getline(def, 251))
+        cout << "  = " << def << endl;
+    f.close();
+    cout << "Press ENTER to return to Browse!";
+    cin.get();
+    system("cls");
+}
+
+int Result(char *word, char words[][51], char *Path)
+{
+    char p[MAX_PATH], _words[] = "\\_words.txt";
+    cpy(p, Path);
+    cpy(p + leng(p), _words);
+    ifstream f(p);
+    int nrwords = 0, lgword = leng(word);
+    while(f.getline(words[nrwords], 51))
+        if (ncmp(words[nrwords], word, lgword) == true)
+            break;
+        else
+            continue;
+    char w[51];
+    do
+        if(ncmp(words[nrwords], word, lgword) == true)
+        {
+            cpy(w, words[nrwords]);
+            nrwords++;
+            f.getline(words[nrwords], 51);
+        }
+        else
+            break;
+    while(words[nrwords][0] && nrwords < 25);
+    gotoxy(1, 0);
+    for(int i = 1; i <= 25; i++)
+        cout << "                                                  \n";
+    gotoxy(1, 0);
+    for(int i = 0; i < nrwords; i++)
+        cout << "    " << words[i] << endl;
+    f.close();
+    return nrwords;
+}
+
+void Browse(char *Path)
+{
+    system("cls");
+    ShowConsoleCursor(true);
+    int lgword = 0, nrwords = 0;
+    char word[51], words[25][51], ch;
+    cout << "word: ";
+    do
+    {
+        word[lgword] = 0;
+        nrwords = Result(word, words, Path);
+        gotoxy(0, 6);
+        if (lgword) cout << word;
+        ch = getch();
+        if(ch == BACKSPACE)
+        {
+            if(lgword > 0)
+            {
+                word[--lgword] = 0;
+                gotoxy(0, 6 + lgword);
+                cout << ' ';
+            }
+        }
+        else if(ch == KEYS)
+        {
+            ch = getch();
+            if(ch == DOWN && nrwords)
+            {
+                ShowConsoleCursor(false);
+                int pos = 1;
+                do
+                {
+                    gotoxy(pos, 5 + leng(words[pos - 1]));
+                    cout << '*';
+                    ch = getch();
+                    if(ch == KEYS)
+                    {
+                        ch = getch();
+                        if(ch == UP || ch == DOWN)
+                        {
+                            gotoxy(pos, 5 + leng(words[pos - 1]));
+                            cout << ' ';
+                            if(ch == UP)
+                                pos--;
+                            else
+                                pos++;
+                            if(pos == 0) pos = nrwords;
+                            if(pos > nrwords) pos = 1;
+                        }
+                    }
+                    else if(ch == ENTER)
+                    {
+                        Showdefs(words[pos - 1], Path);
+                        cout << "word: ";
+                        gotoxy(0, 6);
+                        if (lgword)
+                            cout << word;
+                        Result(word, words, Path);
+                    }
+                }
+                while(ch != ESCAPE);
+                if(ch == ESCAPE)
+                    ch = 0;
+                ShowConsoleCursor(true);
+            }
+        }
+        if(ch >= 'a' && ch <= 'z')
+            word[lgword++] = ch;
+    }
+    while(ch != ENTER && ch != ESCAPE);
+    ShowConsoleCursor(false);
+    system("cls");
+}
+
+bool Choose(char *choice)
+{
+    system("cls");
+    fstream f;
+    char p[MAX_PATH], _docs[] = "\\_docs.txt";
+    cpy(p, path());
+    cpy(p + leng(p), _docs);
+    f.open(p, ios_base::in);
+    int number;
+    f >> number;
+    if(number == 0)
+    {
+        cout << "Right now, there are no 'dictionaries'." << endl;
+        cout << "Press ENTER to create a new one, or other key to exit to menu." << endl;
+        char ch = getch();
+        if(ch == ENTER)
+            newDictionary();
+        system("cls");
+        return false;
+    }
+    else
+    {
+        char docsPath[MAX_PATH], auxPath[MAX_PATH], _docs[] = "\\_docs.txt", _aux[] = "\\_aux.txt";
+        cpy(docsPath, path());
+        cpy(auxPath, docsPath);
+        int lengPath = leng(docsPath);
+        cpy(docsPath + lengPath, _docs);
+        cpy(auxPath + lengPath, _aux);
+        fstream f1, f2;
+        f1.open(docsPath, ios_base::in);
+        f2.open(auxPath, ios_base::out);
+        int nrdict, lengths[25], nrwords[25];
+        char line[51];
+        f1 >> nrdict;
+        f1.get();
+        for(int i = 0; i < nrdict; i++)
+        {
+            f1.getline(line, 51);
+            lengths[i] = leng(line);
+            f1 >> nrwords[i];
+            f1.get();
+            f2 << line << '\n';
+            cout << line << '\n';
+        }
+        f1.close();
+        f2.close();
+        char ch;
+        int pos = 0;
+        do
+        {
+            gotoxy(pos, lengths[pos]);
+            cout << " <" << nrwords[pos] << " words>";
+            ch = getch();
+            if(ch == KEYS)
+            {
+                ch = getch();
+                if(ch == UP || ch == DOWN)
+                {
+                    gotoxy(pos, lengths[pos]);
+                    cout << "             ";
+                    if(ch == UP)
+                        pos--;
+                    else
+                        pos++;
+                    pos = (pos + nrdict) % nrdict;
+                }
+            }
+        }
+        while(ch != ENTER);
+        f1.open(auxPath, ios_base::in);
+        while(pos >= 0)
+        {
+            f1.getline(line, 51);
+            pos--;
+        }
+        cpy(choice, line);
+        system("cls");
+        return true;
+    }
+}
+
+void Manage()
+{
+    ShowConsoleCursor(false);
+    char suffix[] = ">";;
+    char Path[MAX_PATH], doc[53], init[] = " <none>";
+    Path[0] = 0;
+    cpy(doc, init);
+    int mod = 6, pos = 0, length[6] = {20 + leng(doc), 13, 10, 20, 20, 5};
+
+    char ch;
+    do
+    {
+        system("cls");
+        cout << "Choose 'dictionary'" << doc << '\n';
+        cout << "Browse words" << '\n';
+        cout << "Add words" << '\n';
+        cout << "Create 'dictionary'" << '\n';
+        cout << "Delete 'dictionary'" << '\n';
+        cout << "Exit" << '\n';
+        do
+        {
+            gotoxy(pos, length[pos]);
+            cout << '*';
+            ch = getch();
+            if(ch == KEYS)
+            {
+                ch = getch();
+                if(ch == UP || ch == DOWN)
+                {
+                    gotoxy(pos, length[pos]);
+                    cout << ' ';
+                    if(ch == UP)
+                        pos--;
+                    else
+                        pos++;
+                    pos = (pos + mod) % mod;
+                }
+            }
+        }
+        while(ch != ENTER);
+        switch(pos)
+        {
+        case 0:
+            if (Choose(doc + 2) == true)
+            {
+                cpy(Path, path());
+                Path[leng(Path) + 1] = 0;
+                Path[leng(Path)] = '\\';
+                cpy(Path + leng(Path), doc + 2);
+                cpy(doc + leng(doc), suffix);
+                length[0] = 20 + leng(doc);
+            }
+            else
+                Continue("No 'dictionary' is selected!");
+            break;
+        case 1:
+            if(Path[0])
+                Browse(Path);
+            else
+                Continue("No 'dictionary' is selected!");
+            break;
+        case 2:
+            if(Path[0])
+                Addwords(Path);
+                else
+                    Continue("No 'dictionary' is selected!");
+            break;
+        case 3:
+            newDictionary();
+            break;
+        case 4:
+            if(Path[0])
+            {
+                delDictionary(Path);
+                Path[0] = 0;
+                cpy(doc, init);
+                length[0] = 20 + leng(doc);
+            }
+            else
+                    Continue("No 'dictionary' is selected!");
+            break;
+        }
+    }
+    while(pos != (mod - 1) && ch != ESCAPE);
+    ShowConsoleCursor(true);
+}
+
+int main()
+{
+    Manage();
+    return 0;
 }
