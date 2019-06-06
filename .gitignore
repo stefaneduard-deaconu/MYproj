@@ -2,10 +2,20 @@
 *.txt
 *.rtf
 *.docx
-dictionar___nu_numai
-proiect_atestat
+auxdir
 _aux.txt
-
+# for cmake building:
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
 
 
 # Prerequisites
