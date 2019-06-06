@@ -10,7 +10,7 @@ int main()
 
   // here we'll instantiate and work with the class
   App app;
-  app.Manage();
+  app.start();
   //
 
   return 0;

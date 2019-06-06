@@ -4,7 +4,7 @@
 #include <windows.h>
 #include "char_star.h"
 
-char *path()
+char* path()
 {
   char *p = new char[MAX_PATH];
   GetModuleFileName(NULL, p, MAX_PATH);

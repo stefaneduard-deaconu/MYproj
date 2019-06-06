@@ -10,14 +10,14 @@ using namespace std;
 class App
 {
 public:
-    static const char ENTER = 13, ESCAPE = 27, BACKSPACE = 8, KEYS = -32, UP = 72, DOWN = 80, LEFT = 75, RIGHT = 77;
-    void Manage()
+    static const char ENTER = 13, ESCAPE = 27, BACKSPACE = 8,
+        KEYS = -32, UP = 72, DOWN = 80, LEFT = 75, RIGHT = 77;
+    void start()
     {
-        ShowConsoleCursor(false);
+        show_console_cursor(false);
         char suffix[] = ">";
-        ;
-        char Path[MAX_PATH], doc[53], init[] = " <none>";
-        Path[0] = 0;
+        char app_path[MAX_PATH], doc[53], init[] = " <none>";
+        app_path[0] = 0;
         cpy(doc, init);
         int mod = 6, pos = 0, length[6] = {20 + leng(doc), 13, 10, 20, 20, 5};
 
@@ -55,52 +55,52 @@ public:
             switch (pos)
             {
             case 0:
-                if (Choose(doc + 2) == true)
+                if (choose_dictionary(doc + 2) == true)
                 {
-                    cpy(Path, path());
-                    Path[leng(Path) + 1] = 0;
-                    Path[leng(Path)] = '\\';
-                    cpy(Path + leng(Path), doc + 2);
+                    cpy(app_path, path());
+                    app_path[leng(app_path) + 1] = 0;
+                    app_path[leng(app_path)] = '\\';
+                    cpy(app_path + leng(app_path), doc + 2);
                     cpy(doc + leng(doc), suffix);
                     length[0] = 20 + leng(doc);
                 }
                 else
-                    Continue("No 'dictionary' is selected!");
+                    continue_message("No 'dictionary' is selected!");
                 break;
             case 1:
-                if (Path[0])
-                    Browse(Path);
+                if (app_path[0])
+                    Browse(app_path);
                 else
-                    Continue("No 'dictionary' is selected!");
+                    continue_message("No 'dictionary' is selected!");
                 break;
             case 2:
-                if (Path[0])
-                    Addwords(Path);
+                if (app_path[0])
+                    add_words(app_path);
                 else
-                    Continue("No 'dictionary' is selected!");
+                    continue_message("No 'dictionary' is selected!");
                 break;
             case 3:
                 newDictionary();
                 break;
             case 4:
-                if (Path[0])
+                if (app_path[0])
                 {
-                    delDictionary(Path);
-                    Path[0] = 0;
+                    delDictionary(app_path);
+                    app_path[0] = 0;
                     cpy(doc, init);
                     length[0] = 20 + leng(doc);
                 }
                 else
-                    Continue("No 'dictionary' is selected!");
+                    continue_message("No 'dictionary' is selected!");
                 break;
             }
         }
         while (pos != (mod - 1) && ch != ESCAPE);
-        ShowConsoleCursor(true);
+        show_console_cursor(true);
     }
 private:
 
-    void Continue(const char *message)
+    void continue_message(const char *message)
     {
         system("cls");
         cout << message << endl;
@@ -110,64 +110,63 @@ private:
     }
 ///
 
-    bool exists(char *name,
-                char *Path) /// trebuie verificate toate cazurile posibile
+    bool word_exists(char *word, char *dict_path)
     {
         char _words[] = "\\_words.txt", _aux[] = "\\_aux.txt";
         char p1[MAX_PATH], p2[MAX_PATH];
-        cpy(p1, Path);
+        cpy(p1, dict_path);
         cpy(p1 + leng(p1), _words);
-        cpy(p2, Path);
+        cpy(p2, dict_path);
         cpy(p2 + leng(p2), _aux);
         fstream f1, f2;
         f1.open(p1, ios_base::in);
         f2.open(p2, ios_base::out);
-        char word[51];
-        while (f1.getline(word, 51) && cmp(word, name) == -1)
-            f2 << word << '\n';
-        if (word[0] && cmp(word, name) == 0)
+        char read_word[51];
+        while (f1.getline(read_word, 51) && cmp(read_word, word) == -1)
+            f2 << read_word << '\n';
+        if (read_word[0] && cmp(read_word, word) == 0)
         {
-            Continue("The word is already in the dictionary!");
+            continue_message("The word is already in the dictionary!");
             return true;
         }
-        f2 << name << '\n';
-        if (word[0])
-            f2 << word << '\n';
-        while (f1.getline(word, 51))
-            f2 << word << '\n';
+        f2 << word << '\n';
+        if (read_word[0])
+            f2 << read_word << '\n';
+        while (f1.getline(read_word, 51))
+            f2 << read_word << '\n';
         f1.close();
         f2.close();
         f1.open(p2, ios_base::in);
         f2.open(p1, ios_base::out);
-        while (f1.getline(word, 51))
-            f2 << word << '\n';
+        while (f1.getline(read_word, 51))
+            f2 << read_word << '\n';
         f1.close();
         f2.close();
         return false;
     }
-    void Addwords(char *Path)
+    void add_words(char *dict_path)
     {
         system("cls");
-        ShowConsoleCursor(true);
-        fstream f;
-        char word[52], wordPath[MAX_PATH], *ptr1, *ptr2, dottxt[] = ".txt";
+        show_console_cursor(true);
+        fstream file_stream;
+        char word[52], word_path[MAX_PATH], *ptr1, *ptr2, dottxt[] = ".txt";
         word[0] = '\\';
         ptr1 = word + 1;
-        cpy(wordPath, Path);
-        int lengPath = leng(wordPath);
-        ptr2 = wordPath + lengPath;
-        int nrwords = 0;
+        cpy(word_path, dict_path);
+        int word_path_length = leng(word_path);
+        ptr2 = word_path + word_path_length;
+        int num_words = 0;
         do
         {
             cout << "word:    <ENTER TO STOP>" << '\n';
             cin.getline(ptr1, 51);
             int lgw = leng(ptr1);
-            if (lgw && exists(ptr1, Path) == false)
+            if (lgw && word_exists(ptr1, dict_path) == false)
             {
-                nrwords++;
+                num_words++;
                 cpy(ptr1 + lgw, dottxt);
                 cpy(ptr2, word);
-                f.open(wordPath, ios_base::out);
+                file_stream.open(word_path, ios_base::out);
                 char def[251];
                 cout << "    definitions:    <ENTER TO STOP>" << '\n';
                 do
@@ -175,31 +174,31 @@ private:
                     cout << "    ";
                     cin.getline(def, 251);
                     if (def[0])
-                        f << def << '\n';
+                        file_stream << def << '\n';
                     else
                         break;
                 }
                 while (def[0]);
-                f.close();
+                file_stream.close();
             }
         }
         while (ptr1[0]);
-        char docsPath[MAX_PATH], auxPath[MAX_PATH], _docs[] = "\\_docs.txt",
+        char docs_path[MAX_PATH], aux_path[MAX_PATH], _docs[] = "\\_docs.txt",
                 _aux[] = "\\_aux.txt";
-        cpy(docsPath, Path);
-        cpy(auxPath, Path);
-        int pos = lengPath;
-        while (docsPath[pos] != '\\')
+        cpy(docs_path, dict_path);
+        cpy(aux_path, dict_path);
+        int pos = word_path_length;
+        while (docs_path[pos] != '\\')
             pos--;
-        char dictname[51];
-        cpy(dictname, docsPath + pos + 1);
-        cpy(docsPath + pos, _docs);
-        cpy(auxPath + pos, _aux);
+        char dict_name[51];
+        cpy(dict_name, docs_path + pos + 1);
+        cpy(docs_path + pos, _docs);
+        cpy(aux_path + pos, _aux);
         fstream f1, f2;
         int number;
         char line[51];
-        f1.open(docsPath, ios_base::in);
-        f2.open(auxPath, ios_base::out);
+        f1.open(docs_path, ios_base::in);
+        f2.open(aux_path, ios_base::out);
         f1 >> number;
         f2 << number << '\n';
         f1.get();
@@ -207,19 +206,19 @@ private:
         {
             f1 >> number;
             f1.get();
-            if (cmp(line, dictname) == 0)
-                number += nrwords;
+            if (cmp(line, dict_name) == 0)
+                number += num_words;
             f2 << line << '\n' << number << '\n';
         }
         f1.close();
         f2.close();
-        f1.open(auxPath, ios_base::in);
-        f2.open(docsPath, ios_base::out);
+        f1.open(aux_path, ios_base::in);
+        f2.open(docs_path, ios_base::out);
         while (f1.getline(line, 51))
             f2 << line << '\n';
         f1.close();
         f2.close();
-        ShowConsoleCursor(false);
+        show_console_cursor(false);
         system("cls");
     }
 
@@ -250,7 +249,7 @@ private:
         }
         if (line[0] && cmp(line, name) == 0)
         {
-            Continue("There already is a 'dictionnary' with the same name!");
+            continue_message("There already is a 'dictionnary' with the same name!");
             return true;
         }
         f2 << name << '\n' << '0' << '\n';
@@ -288,7 +287,7 @@ private:
     void newDictionary()
     {
         system("cls");
-        ShowConsoleCursor(true);
+        show_console_cursor(true);
         cout << "Name of the 'dictionary':    <ENTER TO EXIT>" << '\n';
         char name[51];
         cin.getline(name, 51);
@@ -303,10 +302,10 @@ private:
                 cpy(p + leng(p), bslash);
                 cpy(p + leng(p), name);
                 CreateDirectory(p, NULL);
-                Addwords(p);
+                add_words(p);
             }
         }
-        ShowConsoleCursor(false);
+        show_console_cursor(false);
         system("cls");
     }
 
@@ -430,7 +429,7 @@ private:
     void Browse(char *Path)
     {
         system("cls");
-        ShowConsoleCursor(true);
+        show_console_cursor(true);
         int lgword = 0, nrwords = 0;
         char word[51], words[25][51], ch;
         cout << "word: ";
@@ -456,7 +455,7 @@ private:
                 ch = getch();
                 if (ch == DOWN && nrwords)
                 {
-                    ShowConsoleCursor(false);
+                    show_console_cursor(false);
                     int pos = 1;
                     do
                     {
@@ -493,18 +492,18 @@ private:
                     while (ch != ESCAPE);
                     if (ch == ESCAPE)
                         ch = 0;
-                    ShowConsoleCursor(true);
+                    show_console_cursor(true);
                 }
             }
             if (ch >= 'a' && ch <= 'z')
                 word[lgword++] = ch;
         }
         while (ch != ENTER && ch != ESCAPE);
-        ShowConsoleCursor(false);
+        show_console_cursor(false);
         system("cls");
     }
 
-    bool Choose(char *choice)
+    bool choose_dictionary(char *choice)
     {
         system("cls");
         fstream f;
