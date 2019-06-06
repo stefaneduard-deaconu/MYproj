@@ -1,0 +1,152 @@
+\begin{theindex}
+
+  \item {App}, \hyperpage{9}
+    \subitem {BACKSPACE}, \hyperpage{10}
+    \subitem {DOWN}, \hyperpage{10}
+    \subitem {ENTER}, \hyperpage{10}
+    \subitem {ESCAPE}, \hyperpage{10}
+    \subitem {get\_instance}, \hyperpage{9}
+    \subitem {KEYS}, \hyperpage{10}
+    \subitem {LEFT}, \hyperpage{10}
+    \subitem {RIGHT}, \hyperpage{11}
+    \subitem {start}, \hyperpage{10}
+    \subitem {UP}, \hyperpage{11}
+  \item {app\_class.h}, \hyperpage{17}
+
+  \indexspace
+
+  \item {BACKSPACE}
+    \subitem {App}, \hyperpage{10}
+
+  \indexspace
+
+  \item {char\_star.h}, \hyperpage{17}
+    \subitem {cmp}, \hyperpage{17}
+    \subitem {cpy}, \hyperpage{17}
+    \subitem {leng}, \hyperpage{18}
+    \subitem {ncmp}, \hyperpage{18}
+  \item {clone}
+    \subitem {Dictionary\_prototype}, \hyperpage{13}
+    \subitem {Mult\_def\_dict}, \hyperpage{14}
+    \subitem {One\_def\_dict}, \hyperpage{15}
+  \item {cmp}
+    \subitem {char\_star.h}, \hyperpage{17}
+  \item {console.h}, \hyperpage{18}
+    \subitem {gotoxy}, \hyperpage{18}
+    \subitem {show\_console\_cursor}, \hyperpage{18}
+  \item {cpy}
+    \subitem {char\_star.h}, \hyperpage{17}
+
+  \indexspace
+
+  \item {def\_per\_word}
+    \subitem {Dictionary\_prototype}, \hyperpage{13}
+  \item {dict\_class.h}, \hyperpage{19}
+  \item {dict\_count}
+    \subitem {Dictionary\_prototype}, \hyperpage{13}
+  \item {Dict\_factory}, \hyperpage{11}
+    \subitem {get\_dictionary\_3}, \hyperpage{11}
+    \subitem {get\_dictionary\_5}, \hyperpage{11}
+    \subitem {get\_dictionary\_single}, \hyperpage{12}
+    \subitem {initialise}, \hyperpage{12}
+  \item {Dictionary\_prototype}, \hyperpage{12}
+    \subitem {clone}, \hyperpage{13}
+    \subitem {def\_per\_word}, \hyperpage{13}
+    \subitem {dict\_count}, \hyperpage{13}
+    \subitem {get\_defs\_per\_word}, \hyperpage{13}
+    \subitem {set\_dpw}, \hyperpage{13}
+  \item {DOWN}
+    \subitem {App}, \hyperpage{10}
+
+  \indexspace
+
+  \item {ENTER}
+    \subitem {App}, \hyperpage{10}
+  \item {ESCAPE}
+    \subitem {App}, \hyperpage{10}
+
+  \indexspace
+
+  \item {get\_defs\_per\_word}
+    \subitem {Dictionary\_prototype}, \hyperpage{13}
+    \subitem {Mult\_def\_dict}, \hyperpage{14}
+    \subitem {One\_def\_dict}, \hyperpage{15}
+  \item {get\_dictionary\_3}
+    \subitem {Dict\_factory}, \hyperpage{11}
+  \item {get\_dictionary\_5}
+    \subitem {Dict\_factory}, \hyperpage{11}
+  \item {get\_dictionary\_single}
+    \subitem {Dict\_factory}, \hyperpage{12}
+  \item {get\_instance}
+    \subitem {App}, \hyperpage{9}
+  \item {gotoxy}
+    \subitem {console.h}, \hyperpage{18}
+
+  \indexspace
+
+  \item {initialise}
+    \subitem {Dict\_factory}, \hyperpage{12}
+
+  \indexspace
+
+  \item {KEYS}
+    \subitem {App}, \hyperpage{10}
+
+  \indexspace
+
+  \item {LEFT}
+    \subitem {App}, \hyperpage{10}
+  \item {leng}
+    \subitem {char\_star.h}, \hyperpage{18}
+
+  \indexspace
+
+  \item {main}
+    \subitem {main.cpp}, \hyperpage{19}
+  \item {main.cpp}, \hyperpage{19}
+    \subitem {main}, \hyperpage{19}
+  \item {Mult\_def\_dict}, \hyperpage{14}
+    \subitem {clone}, \hyperpage{14}
+    \subitem {get\_defs\_per\_word}, \hyperpage{14}
+    \subitem {Mult\_def\_dict}, \hyperpage{14}
+
+  \indexspace
+
+  \item {ncmp}
+    \subitem {char\_star.h}, \hyperpage{18}
+
+  \indexspace
+
+  \item {One\_def\_dict}, \hyperpage{15}
+    \subitem {clone}, \hyperpage{15}
+    \subitem {get\_defs\_per\_word}, \hyperpage{15}
+    \subitem {One\_def\_dict}, \hyperpage{15}
+
+  \indexspace
+
+  \item {path}
+    \subitem {path.h}, \hyperpage{20}
+  \item {path.h}, \hyperpage{19}
+    \subitem {path}, \hyperpage{20}
+
+  \indexspace
+
+  \item {README.md}, \hyperpage{20}
+  \item {RIGHT}
+    \subitem {App}, \hyperpage{11}
+
+  \indexspace
+
+  \item {set\_dpw}
+    \subitem {Dictionary\_prototype}, \hyperpage{13}
+  \item {show\_console\_cursor}
+    \subitem {console.h}, \hyperpage{18}
+  \item {start}
+    \subitem {App}, \hyperpage{10}
+
+  \indexspace
+
+  \item {UP}
+    \subitem {App}, \hyperpage{11}
+
+\end{theindex}
