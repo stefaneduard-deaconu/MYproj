@@ -9,7 +9,8 @@ int main()
 {
 
   // here we'll instantiate and work with the class
-  Manage();
+  App app;
+  app.Manage();
   //
 
   return 0;
